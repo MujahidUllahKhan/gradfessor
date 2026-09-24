@@ -1,0 +1,46 @@
+// Browser smoke test: node tests/smoke.playwright.js  (needs `npm i -D playwright`)
+const path = require('path');
+const { chromium } = require('playwright');
+(async () => {
+  const out = process.argv[2] || path.join(__dirname, '..', '.smoke');
+  require('fs').mkdirSync(out, { recursive: true });
+  const browser = await chromium.launch(process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : {});
+  const page = await browser.newPage({ viewport: { width: 1360, height: 900 }, acceptDownloads: true });
+  const errors = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  page.on('console', (m) => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errors.push(m.text()); });
+  await page.goto('file://' + path.join(__dirname, '..', 'extension', 'app.html'));
+  await page.click('#btn-sample');
+  await page.waitForSelector('.prof');
+  const scores = await page.$$eval('.prof .score .n', (els) => els.map((e) => e.textContent));
+  console.log('scores', scores);
+  await page.screenshot({ path: path.join(out, 'match.png'), fullPage: true });
+  await page.click('[data-view=profile]');
+  await page.screenshot({ path: path.join(out, 'profile.png'), fullPage: true });
+  await page.click('[data-view=match]');
+  await page.click('.prof [data-act=email]');
+  await page.waitForSelector('.draft');
+  await page.click('[data-use="0"]');
+  console.log('email score', await page.textContent('#w-score'));
+  await page.screenshot({ path: path.join(out, 'writing.png'), fullPage: true });
+  await page.click('[data-view=match]');
+  await page.click('.prof [data-act=track]:not([disabled])');
+  await page.click('[data-view=tracker]');
+  await page.screenshot({ path: path.join(out, 'tracker.png'), fullPage: true });
+  const [dl] = await Promise.all([page.waitForEvent('download'), page.click('#btn-export')]);
+  const file = path.join(out, dl.suggestedFilename());
+  await dl.saveAs(file);
+  console.log('export', file);
+  // reload persists
+  await page.reload();
+  await page.click('[data-view=tracker]');
+  console.log('rows after reload', await page.$$eval('#con-table tr[data-id]', (r) => r.length));
+  await page.setViewportSize({ width: 400, height: 860 });
+  await page.click('[data-view=match]');
+  await page.screenshot({ path: path.join(out, 'mobile.png'), fullPage: false });
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
+  console.log('horizontal overflow at 400px:', overflow);
+  console.log('errors', errors);
+  await browser.close();
+  if (errors.length) process.exit(1);
+})();

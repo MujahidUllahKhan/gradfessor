@@ -1,0 +1,21 @@
+Sara Khan
+sara.sample@example.com | linkedin.com/in/sara-sample | github.com/sarasample
+RESEARCH INTERESTS
+Supply chain optimization, reinforcement learning, stochastic optimization
+EDUCATION
+MS in Industrial Engineering, Example State University, 2026
+GPA: 3.86/4.0
+BS in Mathematics, Sample Institute of Science, 2024
+CGPA 3.52 / 4.0
+TEST SCORES
+IELTS Academic: 7.5 (Listening 8.0, Reading 7.5, Writing 6.5, Speaking 7.0)
+GRE: Verbal 152, Quant 166, AW 3.5
+SKILLS
+Python, Gurobi, PyTorch, SQL
+Discrete-event simulation
+RELEVANT COURSEWORK
+Nonlinear Programming, Stochastic Processes
+PUBLICATIONS
+Demand forecasting with gradient boosting for pharmacy inventory (under review)
+AWARDS
+Graduate Merit Scholarship, 2025

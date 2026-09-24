@@ -1,0 +1,43 @@
+{
+  "manifest_version": 3,
+  "name": "Gradfessor by Afridi",
+  "short_name": "Gradfessor",
+  "version": "0.4.2",
+  "description": "The right student for the right professor. Rank professors by research fit, improve your SOP and emails, track applications. Free.",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_title": "Gradfessor by Afridi",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": [
+    "storage",
+    "unlimitedStorage",
+    "activeTab",
+    "scripting",
+    "alarms",
+    "notifications"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  "host_permissions": [
+    "https://api.openalex.org/*"
+  ],
+  "optional_host_permissions": [
+    "https://*/*",
+    "http://*/*"
+  ],
+  "homepage_url": "https://github.com/MujahidUllahKhan/gradfessor"
+}

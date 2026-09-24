@@ -1,0 +1,11 @@
+:root { --ink:#15212e; --muted:#5a6776; --line:#d9dfe6; --accent:#0e5a6b; --paper:#f7f8fa; color-scheme: light; }
+@media (prefers-color-scheme: dark) { :root { --ink:#e6ebf0; --muted:#9aa7b4; --line:#2f3b47; --accent:#5fb3c4; --paper:#141b22; color-scheme: dark; } }
+body { margin:0; padding:14px; width:300px; font:14px/1.45 "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif; background:var(--paper); color:var(--ink); display:grid; gap:10px; }
+.pop-head { display:flex; gap:10px; align-items:center; }
+.pop-head em { font-style: normal; font-weight: 400; color: var(--muted); }
+.pop-head span { display:block; font-size:12px; color:var(--muted); }
+.pop-btn { font:inherit; padding:9px 12px; border-radius:6px; border:1px solid var(--line); background:transparent; color:var(--ink); cursor:pointer; text-align:left; }
+.pop-btn:hover { border-color:var(--accent); }
+.pop-btn.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+.pop-hint { margin:0; font-size:12px; color:var(--muted); }
+.pop-status { margin:0; font-size:12px; color:var(--accent); min-height:1em; }

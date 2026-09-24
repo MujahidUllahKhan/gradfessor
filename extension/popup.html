@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Gradfessor by Afridi</title>
+<link rel="stylesheet" href="css/popup.css">
+</head>
+<body>
+  <header class="pop-head">
+    <img src="icons/icon48.png" alt="" width="28" height="28">
+    <div>
+      <strong>Gradfessor <em>by Afridi</em></strong>
+      <span id="pop-site">The right student for the right professor</span>
+    </div>
+  </header>
+
+  <section id="sec-mail" hidden>
+    <button id="cap-email" class="pop-btn primary">Capture this email reply</button>
+    <p class="pop-hint">Open the professor's reply first. Select the reply text for a cleaner capture. The app will ask which professor it belongs to.</p>
+  </section>
+
+  <section id="sec-web">
+    <button id="scan" class="pop-btn primary">Scan whole department</button>
+    <p class="pop-hint">Use on a department's faculty list. Gradfessor reads each profile for you in the background (one page every few seconds) and ranks everyone against your profile.</p>
+    <button id="cap-req" class="pop-btn">Capture program requirements</button>
+    <p class="pop-hint">Use on a program's admissions page: deadlines, IELTS/TOEFL/GRE, minimum GPA, fee and fee waiver are pulled out for you to check.</p>
+    <button id="capture" class="pop-btn">Capture this page as one professor</button>
+    <p class="pop-hint">For a single faculty profile, lab page or Google Scholar page. Select text first to capture only that part.</p>
+  </section>
+
+  <button id="open-app" class="pop-btn">Open Gradfessor</button>
+  <p id="pop-status" class="pop-status" role="status"></p>
+  <script src="js/scan-utils.js"></script>
+  <script src="js/popup.js"></script>
+</body>
+</html>

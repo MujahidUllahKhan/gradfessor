@@ -1,0 +1,19 @@
+{
+  "name": "gradfessor",
+  "version": "0.4.2",
+  "private": true,
+  "description": "Free, local-first Chrome extension for grad school applicants: professor matching, writing feedback, and an application tracker.",
+  "scripts": {
+    "test": "node --test tests/core.test.js",
+    "build:template": "node tools/build-template.js",
+    "package": "node tools/package-extension.js",
+    "test:browser": "node tests/smoke.playwright.js && node tests/extension.playwright.js && node tests/scan.playwright.js && node tests/v04.playwright.js && node tests/persist.playwright.js",
+    "package:store": "node tools/package-extension.js --store",
+    "setup": "node tools/setup.js"
+  },
+  "devDependencies": {
+    "exceljs": "4.4.0",
+    "playwright": "^1.63.0"
+  },
+  "license": "MIT"
+}

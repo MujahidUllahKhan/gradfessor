@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gradfessor by Afridi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,500;6..72,600&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="css/app.css">
+<link rel="icon" href="icons/icon48.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0e5a6b">
+<meta name="gradfessor-app" content="1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://api.openalex.org; object-src 'none'; base-uri 'none'; form-action 'none'">
+</head>
+<body>
+<div class="shell">
+  <aside class="rail">
+    <div class="brand">
+      <img src="icons/icon48.png" alt="" width="32" height="32">
+      <div><strong>Gradfessor</strong><span>by Afridi · the right student for the right professor</span></div>
+    </div>
+    <nav class="nav" aria-label="Sections">
+      <button data-view="guide">Start here</button>
+      <button data-view="profile" aria-current="page">My profile <span class="count" id="nav-strength"></span></button>
+      <button data-view="match">Professors <span class="count" id="nav-prof"></span></button>
+      <button data-view="writing">Writing coach</button>
+      <button data-view="prompts">AI prompt pack</button>
+      <button data-view="tracker">Tracker <span class="count" id="nav-track"></span></button>
+      <button data-view="universities">University reports <span class="count" id="nav-uni"></span></button>
+    </nav>
+    <div class="rail-foot">
+      <div class="strength">
+        <div class="eyebrow">Profile strength</div>
+        <div class="bar"><i id="strength-bar"></i></div>
+        <div><b class="num" id="strength-num">0</b> / 100</div>
+      </div>
+      <span id="save-status" class="save-status">Not saved yet</span>
+      <span id="ext-status" class="ext-status">Checking extension…</span>
+      <span>Scores are text-overlap guides, not admission predictions.</span>
+      <span class="credit">Built by Mujahid Ullah Khan Afridi · v<span id="app-version">0.4.2</span></span>
+    </div>
+  </aside>
+
+  <main>
+    <div class="topbar">
+      <div class="alerts" id="alerts" aria-live="polite"></div>
+      <div class="actions">
+        <button class="btn primary" id="btn-install" hidden>Install desktop app</button>
+        <button class="btn" id="btn-sample" title="Fill the app with a fictional student and professors">Load demo data</button>
+        <button class="btn primary" id="btn-export">Export Excel tracker</button>
+        <button class="btn ghost" id="btn-backup">Backup</button>
+        <button class="btn ghost" id="btn-restore">Restore</button>
+        <input type="file" id="restore-file" accept="application/json" hidden>
+        <button class="btn ghost danger" id="btn-wipe">Delete my data</button>
+      </div>
+    </div>
+    <div id="confirm-slot"></div>
+
+    <!-- ================= PROFILE ================= -->
+    <section class="view" id="view-profile">
+      <div>
+        <h2>My academic profile</h2>
+        <p class="lede">Fill this once. It is saved automatically and stays here for all your future applications; change it only when you want. Every match score, eligibility check, email draft and university report reads from it.</p>
+      </div>
+      <div class="lockbar" id="lockbar">
+        <div><b id="lock-title">Editing your profile</b><div class="small muted" id="lock-sub">Changes save automatically as you type.</div></div>
+        <div class="row-actions">
+          <label class="field check" id="sync-wrap" hidden><input type="checkbox" id="set-sync"> Keep a copy in my Chrome account (restores on a new computer)</label>
+          <button class="btn primary" id="lock-btn">Done, lock my profile</button>
+        </div>
+      </div>
+      <div id="restore-offer" hidden></div>
+      <div class="split">
+        <div class="grid">
+          <div class="card upload-card">
+            <div class="card-head"><h3>Start with your CV</h3><span class="hint">PDF, Word (.docx) or text · read on your computer, never uploaded</span></div>
+            <div class="row-actions">
+              <label class="btn primary" for="cv-file">Upload CV</label>
+              <input type="file" id="cv-file" accept=".pdf,.docx,.txt,.md,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain" hidden>
+              <span class="hint" id="cv-status">Gradfessor reads it and suggests values for the fields below. You approve each one.</span>
+            </div>
+            <div id="cv-suggest" class="grid" hidden></div>
+          </div>
+
+          <div class="card">
+            <h3>Basics</h3>
+            <div class="grid g3">
+              <label class="field">Full name<input id="p-name" data-p="name" autocomplete="name"></label>
+              <label class="field">Email<input id="p-email" data-p="email" type="email" autocomplete="email"></label>
+              <label class="field">Phone (optional)<input id="p-phone" data-p="phone" autocomplete="tel"></label>
+              <label class="field">Home country<input id="p-country" data-p="country" placeholder="e.g. Pakistan"></label>
+              <label class="field">Target field<input id="p-field" data-p="field" placeholder="e.g. Industrial Engineering"></label>
+              <label class="field">Target degree
+                <select id="p-degree" data-p="targetDegree"><option>PhD</option><option>MS</option><option>MS or PhD</option><option>Postdoc</option></select>
+              </label>
+              <label class="field">Target term<input id="p-term" data-p="targetTerm" placeholder="e.g. Fall 2027"></label>
+              <label class="field">Target countries<input id="p-countries" data-p="targetCountries" placeholder="USA, Canada, UK"></label>
+              <label class="field">Funding
+                <select id="p-funding" data-p="funding"><option>Full funding needed</option><option>Partial funding is fine</option><option>Self-funded</option></select>
+              </label>
+            </div>
+            <div class="grid g4">
+              <label class="field">LinkedIn<input id="l-linkedin" data-l="linkedin" placeholder="linkedin.com/in/…"></label>
+              <label class="field">Google Scholar<input id="l-scholar" data-l="scholar" placeholder="scholar.google.com/…"></label>
+              <label class="field">GitHub<input id="l-github" data-l="github" placeholder="github.com/…"></label>
+              <label class="field">Website<input id="l-website" data-l="website"></label>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><h3>Education</h3><button class="btn sm" id="edu-add">Add degree</button></div>
+            <div id="edu-list" class="grid"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><h3>Test scores</h3><span class="hint">Leave blank what you have not taken. Used for eligibility checks.</span></div>
+            <div class="tests">
+              <div class="test-box">
+                <h4>IELTS Academic <span class="hint">bands 0-9</span></h4>
+                <div class="row">
+                  <label class="field">Overall<input id="t-ielts-o" data-t="ielts.overall" inputmode="decimal"></label>
+                  <label class="field">L<input id="t-ielts-l" data-t="ielts.l" inputmode="decimal"></label>
+                  <label class="field">R<input id="t-ielts-r" data-t="ielts.r" inputmode="decimal"></label>
+                  <label class="field">W<input id="t-ielts-w" data-t="ielts.w" inputmode="decimal"></label>
+                  <label class="field">S<input id="t-ielts-s" data-t="ielts.s" inputmode="decimal"></label>
+                </div>
+              </div>
+              <div class="test-box">
+                <h4>TOEFL iBT <span class="hint">0-120, sections 0-30</span></h4>
+                <div class="row">
+                  <label class="field">Total<input id="t-toefl" data-t="toefl.total" inputmode="numeric"></label>
+                  <label class="field">R<input id="t-toefl-r" data-t="toefl.r" inputmode="numeric"></label>
+                  <label class="field">L<input id="t-toefl-l" data-t="toefl.l" inputmode="numeric"></label>
+                  <label class="field">S<input id="t-toefl-s" data-t="toefl.s" inputmode="numeric"></label>
+                  <label class="field">W<input id="t-toefl-w" data-t="toefl.w" inputmode="numeric"></label>
+                </div>
+              </div>
+              <div class="test-box">
+                <h4>GRE General <span class="hint">V/Q 130-170, AW 0-6</span></h4>
+                <div class="row">
+                  <label class="field">Verbal<input id="t-gre-v" data-t="gre.v" inputmode="numeric"></label>
+                  <label class="field">Quant<input id="t-gre-q" data-t="gre.q" inputmode="numeric"></label>
+                  <label class="field">AW<input id="t-gre-aw" data-t="gre.aw" inputmode="decimal"></label>
+                </div>
+              </div>
+              <div class="test-box">
+                <h4>Other tests</h4>
+                <div class="row">
+                  <label class="field">Duolingo<input id="t-duo" data-t="duolingo" inputmode="numeric" placeholder="10-160"></label>
+                  <label class="field">PTE<input id="t-pte" data-t="pte.overall" inputmode="numeric" placeholder="10-90"></label>
+                  <label class="field">GMAT<input id="t-gmat" data-t="gmat" inputmode="numeric"></label>
+                </div>
+                <div class="row">
+                  <label class="field">GRE Subject<input id="t-gres-name" data-t="greSubject.name" placeholder="e.g. Mathematics"></label>
+                  <label class="field">Score<input id="t-gres-score" data-t="greSubject.score" inputmode="numeric"></label>
+                </div>
+              </div>
+            </div>
+            <p class="hint" id="test-warn"></p>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><h3>Coursework</h3><button class="btn sm" id="course-add">Add course</button></div>
+            <p class="hint">Advanced courses with grades help programs judge readiness, and course names count toward the Methods score.</p>
+            <div id="course-list" class="grid"></div>
+            <label class="field">Other courses (optional, comma-separated)<textarea id="p-coursework" data-p="coursework" rows="2"></textarea></label>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><h3>Experience</h3><button class="btn sm" id="exp-add">Add experience</button></div>
+            <p class="hint">Research, jobs, internships, teaching. Describe what you did and one result.</p>
+            <div id="exp-list" class="grid"></div>
+          </div>
+
+          <div class="card">
+            <h3>Research profile</h3>
+            <div class="grid g2">
+              <label class="field full">Research interests <span class="hint">comma-separated, be specific ("stochastic inventory optimization", not "AI")</span>
+                <textarea id="p-interests" data-p="interests" rows="2"></textarea></label>
+              <label class="field full">Skills and tools <span class="hint">languages, solvers, lab methods</span>
+                <textarea id="p-skills" data-p="skills" rows="2"></textarea></label>
+              <label class="field full">Research projects <span class="hint">one per line: question, method, result</span>
+                <textarea id="p-projects" data-p="projects" rows="4"></textarea></label>
+              <label class="field full">Publications / preprints / thesis <span class="hint">one per line</span>
+                <textarea id="p-pubs" data-p="publications" rows="3"></textarea></label>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>More that helps</h3>
+            <div class="grid g3">
+              <label class="field">Awards and scholarships<textarea id="p-awards" data-p="awards" rows="3"></textarea></label>
+              <label class="field">Teaching / mentoring<textarea id="p-teaching" data-p="teaching" rows="3"></textarea></label>
+              <label class="field">Languages<textarea id="p-languages" data-p="languages" rows="3" placeholder="English (fluent), Urdu (native), Pashto (native)"></textarea></label>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Full CV text</h3>
+            <p class="hint">Filled automatically when you upload your CV. You can also paste or edit it here; matching uses all of it.</p>
+            <textarea id="p-cv" data-p="cvText" rows="8" placeholder="Paste your full CV text here"></textarea>
+            <div class="detected" id="cv-detected" hidden></div>
+          </div>
+        </div>
+
+        <aside class="grid sticky">
+          <div class="card">
+            <div class="eyebrow">Profile strength</div>
+            <div class="big-score"><span class="n" id="ps-num">0</span><span class="muted">/ 100</span></div>
+            <ul class="tips" id="ps-tips"></ul>
+          </div>
+          <div class="card">
+            <div class="eyebrow">How each part helps you</div>
+            <ul class="tips">
+              <li><b>Interests, projects, papers</b> → topic fit and evidence overlap with each professor.</li>
+              <li><b>Skills and courses</b> → the Methods score (e.g. Gurobi, PyTorch, Stochastic Processes).</li>
+              <li><b>Test scores and GPA</b> → eligibility checks against each program's minimums.</li>
+              <li><b>Experience and awards</b> → stronger SOP, CV and email drafts in the prompt pack.</li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ================= PROFESSORS ================= -->
+    <section class="view" id="view-match" hidden>
+      <div>
+        <h2>Professor matching</h2>
+        <p class="lede">Add professors you are considering. Paste their faculty page or Google Scholar text, or use the extension button on their page. Each match shows why it scored the way it did.</p>
+      </div>
+      <div class="split wide-right">
+        <div class="grid">
+          <div class="card scan-card" id="scan-card">
+            <div class="card-head"><h3>Rank a whole department</h3><span class="hint" id="scan-hint"></span></div>
+            <ol class="steps">
+              <li>Open the department's <b>Faculty</b> or <b>People</b> page in Chrome.</li>
+              <li>Click the Gradfessor icon, then <b>Scan whole department</b>.</li>
+              <li>Gradfessor reads every profile in the background, finds each professor's recent papers (free, via OpenAlex) and ranks them here. You don't open any profile yourself.</li>
+            </ol>
+            <div id="scan-jobs" class="grid"></div>
+            <details class="settings-box">
+              <summary>Paper lookup settings</summary>
+              <div class="grid g2">
+                <label class="field">OpenAlex API key (optional, free)<input id="set-oa-key" placeholder="Leave blank to use the no-key allowance"></label>
+                <label class="field check"><input type="checkbox" id="set-auto-papers"> Find papers automatically after a scan</label>
+              </div>
+              <p class="hint">Without a key you can look up about 100 professors a day. A free key from openalex.org raises that about 10×. It stays in this browser.</p>
+            </details>
+          </div>
+          <div class="card-head"><h3 id="prof-count">Ranked matches</h3><div class="row-actions"><button class="btn sm" id="btn-papers-all">Find papers for all</button><span class="hint">Sorted by overall score</span></div></div>
+          <div class="prof-list" id="prof-list"></div>
+          <p class="disclaimer">Scores compare the words in your profile with the professor's listed interests and paper titles. Four parts: topic fit 30%, evidence overlap 30%, methods 25%, research style 15%. They show where to look, not your chance of admission. Always read the papers yourself.</p>
+        </div>
+        <div class="card sticky" id="prof-form-card">
+          <div class="card-head"><h3 id="prof-form-title">Add a professor</h3><button class="btn ghost sm" id="prof-reset">Clear</button></div>
+          <div class="capture" id="capture-box" hidden></div>
+          <label class="field">Paste faculty page or Google Scholar text (optional)
+            <textarea id="f-paste" rows="4" placeholder="Select all on their page, copy, paste here"></textarea></label>
+          <button class="btn" id="f-parse">Fill fields from pasted text</button>
+          <div class="grid g2">
+            <label class="field span2">Name<input id="f-name"></label>
+            <label class="field">Title<input id="f-title" placeholder="Associate Professor"></label>
+            <label class="field">Email<input id="f-email" type="email"></label>
+            <label class="field">University<input id="f-university"></label>
+            <label class="field">Department<input id="f-department"></label>
+            <label class="field span2">Profile / lab URL<input id="f-url" type="url"></label>
+            <label class="field span2">Research interests<textarea id="f-interests" rows="2"></textarea></label>
+            <label class="field span2">Recent papers <span class="hint">one per line, include the year</span><textarea id="f-papers" rows="5" placeholder="Title of paper (2025)"></textarea></label>
+          </div>
+          <button class="btn primary" id="f-save">Save and score</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= WRITING ================= -->
+    <section class="view" id="view-writing" hidden>
+      <div>
+        <h2>Writing coach</h2>
+        <p class="lede">Paste a draft for instant, specific feedback. It checks structure, length, clichés, evidence and how well the text fits a chosen professor. It suggests; you write.</p>
+      </div>
+      <div class="seg" role="group" aria-label="Document type" id="doc-seg">
+        <button data-doc="sop" aria-pressed="true">SOP</button>
+        <button data-doc="research" aria-pressed="false">Research statement</button>
+        <button data-doc="cv" aria-pressed="false">CV</button>
+        <button data-doc="cover" aria-pressed="false">Cover letter</button>
+        <button data-doc="email" aria-pressed="false">Email to professor</button>
+      </div>
+      <div class="split wide-right">
+        <div class="grid">
+          <div class="grid g4">
+            <label class="field span2">Target university / program<input id="w-uni" placeholder="e.g. New Mexico State University"></label>
+            <label class="field span2">Professor to tailor for<select id="w-prof"><option value="">None</option></select></label>
+            <label class="field">Min words<input id="w-min" inputmode="numeric"></label>
+            <label class="field">Max words<input id="w-max" inputmode="numeric"></label>
+            <div class="field span2" style="align-self:end"><span class="hint" id="w-limit-hint"></span></div>
+          </div>
+          <textarea class="doc" id="w-text" placeholder="Paste your draft here"></textarea>
+          <div class="row-actions">
+            <button class="btn" id="w-outline">Insert outline</button>
+            <button class="btn" id="w-drafts">Draft emails from my profile</button>
+            <button class="btn" id="w-gmail" hidden>Open in Gmail</button>
+            <button class="btn" id="w-outlook" hidden>Open in Outlook</button>
+            <button class="btn" id="w-prompt">Copy feedback prompt for AI</button>
+            <button class="btn ghost" id="w-clear">Clear</button>
+          </div>
+          <div class="drafts" id="w-draft-list" hidden></div>
+        </div>
+        <aside class="card sticky">
+          <div class="card-head"><div class="eyebrow" id="w-type-label">Statement of Purpose</div></div>
+          <div class="big-score"><span class="n" id="w-score">–</span><span class="muted">/ 100</span></div>
+          <div class="stats">
+            <div class="stat"><b id="w-words">0</b><span>words</span></div>
+            <div class="stat"><b id="w-sents">0</b><span>sentences</span></div>
+            <div class="stat"><b id="w-avg">0</b><span>avg length</span></div>
+            <div class="stat"><b id="w-paras">0</b><span>paragraphs</span></div>
+          </div>
+          <ul class="checks" id="w-checks"></ul>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ================= PROMPTS ================= -->
+    <section class="view" id="view-prompts" hidden>
+      <div>
+        <h2>AI prompt pack</h2>
+        <p class="lede">Build one complete prompt with your facts, the professor's papers and keywords, the document rules and plain-writing rules. Paste it into ChatGPT, Claude or Gemini (free versions work) and ask for the PDF. Then paste the result back into the Writing coach to check it.</p>
+      </div>
+      <div class="seg" role="group" aria-label="Document" id="pr-seg"></div>
+      <div class="split wide-right">
+        <div class="grid">
+          <div class="grid g4">
+            <label class="field span2">Professor (optional)<select id="pr-prof"><option value="">None</option></select></label>
+            <label class="field span2">Program (optional)<select id="pr-app"><option value="">None</option></select></label>
+            <label class="field">Word limit<input id="pr-limit" inputmode="numeric" placeholder="e.g. 1000"></label>
+            <label class="field">Output<select id="pr-output"><option value="files">PDF + Word files</option><option value="text">Text only</option></select></label>
+            <label class="field check"><input type="checkbox" id="pr-contact"> Include my name and email</label>
+            <label class="field check"><input type="checkbox" id="pr-ask" checked> Let the AI ask me questions first</label>
+            <label class="field full">Anything else the AI should know (optional)<textarea id="pr-extra" rows="2" placeholder="e.g. I switched from mathematics to industrial engineering; explain that in one sentence."></textarea></label>
+          </div>
+          <textarea class="doc" id="pr-text" spellcheck="false"></textarea>
+        </div>
+        <aside class="card sticky">
+          <div class="eyebrow">Use it</div>
+          <button class="btn primary" id="pr-copy">Copy prompt</button>
+          <div class="row-actions">
+            <a class="btn" href="https://chatgpt.com/" target="_blank" rel="noopener">ChatGPT</a>
+            <a class="btn" href="https://claude.ai/new" target="_blank" rel="noopener">Claude</a>
+            <a class="btn" href="https://gemini.google.com/app" target="_blank" rel="noopener">Gemini</a>
+          </div>
+          <ol class="steps small">
+            <li>Copy, open an AI chat and paste.</li>
+            <li>Answer its questions honestly.</li>
+            <li>Download the PDF/Word file it makes (free plans may only give text; then paste into Word or Google Docs and export PDF).</li>
+            <li>Read every line. Rewrite the [MY OWN SENTENCE] parts yourself.</li>
+            <li>Paste the final text into the Writing coach for a last check.</li>
+          </ol>
+          <p class="hint" id="pr-stats"></p>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ================= GUIDE ================= -->
+    <section class="view" id="view-guide" hidden>
+      <div>
+        <h2>Start here</h2>
+        <p class="lede">Five steps from "I don't know which professors to email" to a report for every university you apply to. Free, and everything stays on your computer.</p>
+      </div>
+      <ol class="guide">
+        <li class="card"><div class="gnum">1</div><div><h3>Build your profile</h3><p>Upload your CV (PDF or Word). Gradfessor suggests your degrees, GPA, IELTS/TOEFL/GRE, skills and courses; you approve them. Add coursework with grades, experience and links.</p><button class="btn primary" data-go="profile">Open My profile</button></div></li>
+        <li class="card"><div class="gnum">2</div><div><h3>Rank a whole department</h3><p>Open a department's <b>Faculty</b> or <b>People</b> page, click the Gradfessor icon, then <b>Scan whole department</b>. Every professor is read, their recent papers are found (free, via OpenAlex), and they are ranked against your profile.</p><button class="btn" data-go="match">See professors</button></div></li>
+        <li class="card"><div class="gnum">3</div><div><h3>Capture program requirements</h3><p>Open the program's admissions page (deadlines, English requirements, fees). Click the Gradfessor icon, then <b>Capture program requirements</b>. Deadline, IELTS/TOEFL/Duolingo minimums, GRE policy, minimum GPA, fee, fee waiver and letters are filled in for you to check, and compared with your scores.</p><button class="btn" data-go="tracker">Open Tracker</button></div></li>
+        <li class="card"><div class="gnum">4</div><div><h3>Write to the right professors</h3><p>Use <b>Draft email</b> on your top matches, write the one personal sentence, and open it in Gmail. Use the Writing coach and AI prompt pack for your SOP, CV and research statement.</p><button class="btn" data-go="writing">Writing coach</button></div></li>
+        <li class="card"><div class="gnum">5</div><div><h3>Download a report for each university</h3><p>Get an Excel workbook and a Word report per university: programs and requirements, whether you meet them, best-fit professors with papers to read, outreach status and a checklist.</p><button class="btn" data-go="universities">University reports</button></div></li>
+      </ol>
+      <div class="card">
+        <h3>Try it with the demo first</h3>
+        <p class="muted">Load a fictional student, three professors and a program to see every feature. Your own data is replaced, so do this before you enter your real profile (or back up first).</p>
+        <div class="row-actions"><button class="btn" id="guide-demo">Load demo data</button></div>
+      </div>
+    </section>
+
+    <!-- ================= UNIVERSITIES ================= -->
+    <section class="view" id="view-universities" hidden>
+      <div class="topbar">
+        <div>
+          <h2>University reports</h2>
+          <p class="lede">Everything you know about each university in one place, compared with your profile. Download an Excel workbook or a Word report for any university, or one Excel file for all of them.</p>
+        </div>
+        <div class="actions"><button class="btn primary" id="uni-all-xlsx">Excel: all universities</button><button class="btn" id="uni-all-docx">Word: one per university</button></div>
+      </div>
+      <div id="uni-list" class="grid"></div>
+    </section>
+
+    <!-- ================= TRACKER ================= -->
+    <section class="view" id="view-tracker" hidden>
+      <div>
+        <h2>Application tracker</h2>
+        <p class="lede">Deadlines, fees and waivers, required documents, professor emails, follow-ups and interviews in one place. Export it all to Excel any time.</p>
+      </div>
+      <div class="tiles" id="tiles"></div>
+
+      <div id="req-inbox" class="grid" hidden></div>
+      <div class="card-head"><h3>Programs</h3><span class="hint">Tip: on a program's admissions page, click the Gradfessor icon → Capture program requirements</span></div>
+      <details class="form-box" id="app-form-box">
+        <summary id="app-form-title">Add a program</summary>
+        <div class="inner"><div class="grid g4" id="app-form"></div>
+          <div class="row-actions"><button class="btn primary" id="app-save">Save program</button><button class="btn ghost" id="app-cancel">Cancel</button></div>
+        </div>
+      </details>
+      <div class="table-wrap"><table id="app-table"></table></div>
+
+      <div id="mail-inbox" class="grid" hidden></div>
+      <div class="card-head"><h3>Professor outreach</h3>
+        <label class="field" style="grid-auto-flow:column;align-items:center;gap:8px">Follow up after
+          <input id="set-follow" inputmode="numeric" style="width:60px"> business days</label>
+      </div>
+      <details class="form-box" id="con-form-box">
+        <summary id="con-form-title">Add a professor contact</summary>
+        <div class="inner"><div class="grid g4" id="con-form"></div>
+          <div class="row-actions"><button class="btn primary" id="con-save">Save contact</button><button class="btn ghost" id="con-cancel">Cancel</button></div>
+        </div>
+      </details>
+      <div class="table-wrap"><table id="con-table"></table></div>
+      <div class="row-actions">
+        <button class="btn" id="csv-apps">Programs as CSV</button>
+        <button class="btn" id="csv-cons">Outreach as CSV</button>
+      </div>
+    </section>
+  </main>
+</div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script src="lib/exceljs.min.js"></script>
+<script src="lib/docx.iife.js"></script>
+<script src="lib/mammoth.browser.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/bridge.js"></script>
+<script src="js/textkit.js"></script>
+<script src="js/matcher.js"></script>
+<script src="js/coach.js"></script>
+<script src="js/tracker.js"></script>
+<script src="js/export.js"></script>
+<script src="js/openalex.js"></script>
+<script src="js/requirements.js"></script>
+<script src="js/cvimport.js"></script>
+<script src="js/reports.js"></script>
+<script src="js/links.js"></script>
+<script src="js/prompts.js"></script>
+<script src="js/sample-data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
